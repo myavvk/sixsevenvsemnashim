@@ -2,10 +2,408 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Мой сайт</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Поймай спокойствие | расслабляющая игра</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            min-height: 100vh;
+            background: linear-gradient(145deg, #cfe9f5 0%, #d4e6f1 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, sans-serif;
+            padding: 20px;
+        }
+
+        /* Карточка игры */
+        .game-wrapper {
+            background: rgba(255, 248, 235, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 64px;
+            padding: 20px 24px 30px 24px;
+            box-shadow: 0 20px 35px rgba(100, 70, 40, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .game-container {
+            background: #fefaf5;
+            border-radius: 48px;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 12px 24px rgba(0,0,0,0.05);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Панель статистики */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 8px 20px 16px 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .score-box, .best-box {
+            background: #ffffffcc;
+            backdrop-filter: blur(2px);
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #4b6a5c;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .score-box span, .best-box span {
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+
+        .score-value, .best-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-left: 8px;
+            color: #3a5e4e;
+        }
+
+        .reset-btn {
+            background: #e6d5b8;
+            border: none;
+            font-size: 1.2rem;
+            padding: 6px 20px;
+            border-radius: 60px;
+            font-weight: 600;
+            color: #5a4a2e;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .reset-btn:hover {
+            background: #d9c6a3;
+            transform: scale(0.96);
+        }
+
+        /* Игровое поле */
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background: #dde9e0;
+            border-radius: 40px;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            width: 100%;
+            height: auto;
+        }
+
+        .message {
+            text-align: center;
+            padding: 16px 12px 6px 12px;
+            font-size: 0.9rem;
+            color: #8faa9b;
+            font-weight: 500;
+        }
+
+        .message i {
+            font-style: normal;
+            display: inline-block;
+            animation: float 2s infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0px); }
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #bcafa0;
+            margin-top: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .score-value, .best-value {
+                font-size: 1.5rem;
+            }
+            .game-wrapper {
+                padding: 12px;
+            }
+            .stats {
+                padding: 6px 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Привет, мир!</h1>
-    <p>Мой первый сайт на GitHub Pages 🎉</p>
+<div class="game-wrapper">
+    <div class="game-container">
+        <div class="stats">
+            <div class="score-box">
+                <span>🍃 поймано</span>
+                <span class="score-value" id="scoreValue">0</span>
+            </div>
+            <div class="best-box">
+                <span>✨ рекорд</span>
+                <span class="best-value" id="bestValue">0</span>
+            </div>
+            <button class="reset-btn" id="resetGame">⟳ начать заново</button>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="500" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/500"></canvas>
+
+        <div class="message">
+            ☁️ нажимай на облака, листья и звёзды · лови спокойствие 🧘
+        </div>
+        <footer>✧ медленно и с душой ✧</footer>
+    </div>
+</div>
+
+<script>
+    (function(){
+        // ---------- НАСТРОЙКИ ----------
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Размеры (фикс 800x500)
+        canvas.width = 800;
+        canvas.height = 500;
+
+        let score = 0;
+        let bestScore = localStorage.getItem('calmBest') ? parseInt(localStorage.getItem('calmBest')) : 0;
+        document.getElementById('scoreValue').innerText = score;
+        document.getElementById('bestValue').innerText = bestScore;
+
+        // Массив объектов: x, y, radius, type, speedX, speedY
+        let items = [];
+        const MAX_ITEMS = 13;
+        const SPAWN_RATE = 48; // кадров между спавнами
+        let frameCounter = 0;
+
+        // Типы предметов (спокойные, приятные)
+        const TYPES = [
+            { name: 'cloud',  emoji: '☁️', color1: '#f0f4fa', color2: '#d9e3ed', radius: 24, points: 1 },
+            { name: 'leaf',   emoji: '🍃', color1: '#bdd4a5', color2: '#9aba7b', radius: 18, points: 1 },
+            { name: 'star',   emoji: '✨', color1: '#f9eec1', color2: '#f3dd8c', radius: 16, points: 1 },
+            { name: 'petal',  emoji: '🌸', color1: '#f9cfd8', color2: '#f5b0c1', radius: 15, points: 1 },
+            { name: 'feather',emoji: '🕊️', color1: '#e6dfcd', color2: '#dacbaa', radius: 17, points: 1 }
+        ];
+
+        // Обновляем рекорд
+        function updateBestUI() {
+            document.getElementById('bestValue').innerText = bestScore;
+            if(score > bestScore) {
+                bestScore = score;
+                localStorage.setItem('calmBest', bestScore);
+                document.getElementById('bestValue').innerText = bestScore;
+            }
+        }
+
+        // Добавить новый "спокойный" предмет
+        function spawnItem() {
+            if(items.length >= MAX_ITEMS) return;
+
+            const type = TYPES[Math.floor(Math.random() * TYPES.length)];
+            let radius = type.radius;
+            // появляется за границей канваса, плавно залетает
+            let side = Math.floor(Math.random() * 4); // 0:лево,1:право,2:верх,3:низ
+            let x, y;
+            if(side === 0) { // слева
+                x = -radius - 2;
+                y = 30 + Math.random() * (canvas.height - 60);
+            } else if(side === 1) { // справа
+                x = canvas.width + radius + 2;
+                y = 30 + Math.random() * (canvas.height - 60);
+            } else if(side === 2) { // сверху
+                x = 20 + Math.random() * (canvas.width - 40);
+                y = -radius - 2;
+            } else { // снизу
+                x = 20 + Math.random() * (canvas.width - 40);
+                y = canvas.height + radius + 2;
+            }
+
+            // очень медленная, расслабляющая скорость
+            let speedX = (Math.random() - 0.5) * 0.45;
+            let speedY = (Math.random() - 0.5) * 0.45;
+            // чтобы совсем не вязли, минимальный дрейф
+            if(Math.abs(speedX) < 0.15) speedX += (Math.random() - 0.5)*0.2;
+            if(Math.abs(speedY) < 0.15) speedY += (Math.random() - 0.5)*0.2;
+            // ограничим max скорость 0.9
+            speedX = Math.min(Math.max(speedX, -0.9), 0.9);
+            speedY = Math.min(Math.max(speedY, -0.9), 0.9);
+
+            items.push({
+                x: x, y: y, radius: radius, type: type,
+                vx: speedX, vy: speedY
+            });
+        }
+
+        // обновление позиций
+        function updateItems() {
+            for(let i=0; i<items.length; i++) {
+                const it = items[i];
+                it.x += it.vx;
+                it.y += it.vy;
+                // если улетел далеко за край - удаляем
+                if(it.x + it.radius < -100 || it.x - it.radius > canvas.width + 100 ||
+                   it.y + it.radius < -100 || it.y - it.radius > canvas.height + 100) {
+                    items.splice(i,1);
+                    i--;
+                }
+            }
+        }
+
+        // Рисуем градиент + плавные тени
+        function drawItem(item) {
+            ctx.save();
+            ctx.shadowBlur = 6;
+            ctx.shadowColor = "rgba(90, 70, 40, 0.1)";
+            const grad = ctx.createLinearGradient(item.x-6, item.y-6, item.x+6, item.y+6);
+            grad.addColorStop(0, item.type.color1);
+            grad.addColorStop(1, item.type.color2);
+            ctx.beginPath();
+            ctx.arc(item.x, item.y, item.radius-1, 0, Math.PI*2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.shadowBlur = 2;
+            ctx.font = `${item.radius+6}px "Segoe UI Emoji", "Apple Color Emoji", system-ui, sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#2c3e2b";
+            ctx.fillText(item.type.emoji, item.x+1, item.y+1);
+            ctx.fillStyle = "#fefaf0";
+            ctx.fillText(item.type.emoji, item.x, item.y);
+            ctx.restore();
+        }
+
+        function drawBackground() {
+            // Спокойный градиентный фон поля
+            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#e0f0e6');
+            grad.addColorStop(1, '#cfe2cf');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // очень лёгкие облачка-узоры
+            ctx.fillStyle = "#e4f3e8";
+            for(let i=0;i<12;i++) {
+                ctx.beginPath();
+                ctx.ellipse(70+(i*97)%canvas.width, 420+(i*27)%100, 35, 20, 0, 0, Math.PI*2);
+                ctx.fill();
+            }
+            ctx.fillStyle = "#ccddc5";
+            for(let i=0;i<8;i++) {
+                ctx.beginPath();
+                ctx.ellipse(40+(i*131)%canvas.width, 80+(i*19)%70, 28, 18, 0, 0, Math.PI*2);
+                ctx.fill();
+            }
+        }
+
+        function draw() {
+            drawBackground();
+            for(let item of items) {
+                drawItem(item);
+            }
+            // простая подпись в углу для уюта
+            ctx.font = "11px 'Segoe UI'";
+            ctx.fillStyle = "#86a081";
+            ctx.shadowBlur = 0;
+            ctx.fillText("◌ вдох-выдох ◌", canvas.width-85, canvas.height-8);
+        }
+
+        // Обработка клика (поймать спокойствие)
+        function handleCatch(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;   // canvas реальный 800 / отображаемая ширина
+            const scaleY = canvas.height / rect.height;
+
+            let clientX, clientY;
+            if(e.touches) {
+                // тач
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+                e.preventDefault();
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            let canvasX = (clientX - rect.left) * scaleX;
+            let canvasY = (clientY - rect.top) * scaleY;
+
+            // ищем предмет по радиусу
+            for(let i=0; i<items.length; i++) {
+                const it = items[i];
+                const dx = canvasX - it.x;
+                const dy = canvasY - it.y;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if(dist <= it.radius + 5) {
+                    // поймали!
+                    score += it.type.points;
+                    document.getElementById('scoreValue').innerText = score;
+                    updateBestUI();
+
+                    // маленький приятный визуальный эффект
+                    items.splice(i,1);
+                    // мягкий фидбек - легкое мерцание (можно кастом)
+                    canvas.style.transition = '0.05s linear';
+                    canvas.style.filter = 'drop-shadow(0 0 6px #b7d968)';
+                    setTimeout(() => { canvas.style.filter = ''; }, 100);
+                    break;
+                }
+            }
+        }
+
+        // Сброс игры
+        function resetGame() {
+            score = 0;
+            document.getElementById('scoreValue').innerText = "0";
+            items = [];
+            frameCounter = 0;
+            updateBestUI();  // сохранит рекорд, но не обнулит лучший
+        }
+
+        // Цикл анимации
+        function animate() {
+            updateItems();
+            // спавн новых предметов
+            frameCounter++;
+            if(frameCounter >= SPAWN_RATE && items.length < MAX_ITEMS) {
+                spawnItem();
+                frameCounter = 0;
+                // изредка дополнительный спавн для лёгкой динамики
+                if(items.length < 5 && Math.random()<0.3) spawnItem();
+            } else if(frameCounter >= SPAWN_RATE+15) {
+                frameCounter = 0;
+            }
+
+            draw();
+            requestAnimationFrame(animate);
+        }
+
+        // Инициализация событий
+        function init() {
+            // создадим несколько предметов на старте, чтобы не скучно
+            for(let i=0;i<4;i++) {
+                spawnItem();
+            }
+            animate();
+
+            canvas.addEventListener('click', handleCatch);
+            canvas.addEventListener('touchstart', handleCatch, {passive: false});
+            document.getElementById('resetGame').addEventListener('click', () => {
+                resetGame();
+            });
+        }
+
+        init();
+    })();
+</script>
 </body>
 </html>
