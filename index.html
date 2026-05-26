@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Поймай спокойствие | расслабляющая игра</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lo-fi room | спокойная музыка</title>
     <style>
         * {
             margin: 0;
@@ -14,396 +14,340 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(145deg, #cfe9f5 0%, #d4e6f1 100%);
+            background: radial-gradient(circle at 20% 30%, #1a2a2b, #0e1a1c);
+            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, sans-serif;
             padding: 20px;
         }
 
-        /* Карточка игры */
-        .game-wrapper {
-            background: rgba(255, 248, 235, 0.7);
-            backdrop-filter: blur(4px);
-            border-radius: 64px;
-            padding: 20px 24px 30px 24px;
-            box-shadow: 0 20px 35px rgba(100, 70, 40, 0.1);
-            transition: all 0.2s ease;
+        /* главный плеер-карточка */
+        .player-card {
+            max-width: 1100px;
+            width: 100%;
+            background: rgba(20, 25, 30, 0.55);
+            backdrop-filter: blur(18px);
+            border-radius: 54px;
+            padding: 22px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: all 0.2s;
+            border: 1px solid rgba(255,245,210,0.2);
         }
 
-        .game-container {
-            background: #fefaf5;
-            border-radius: 48px;
-            box-shadow: inset 0 1px 4px rgba(0,0,0,0.02), 0 12px 24px rgba(0,0,0,0.05);
+        .container {
+            background: #0f1417c9;
+            border-radius: 44px;
             overflow: hidden;
             padding: 20px;
         }
 
-        /* Панель статистики */
-        .stats {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 8px 20px 16px 20px;
-            flex-wrap: wrap;
-            gap: 15px;
+        /* шапка */
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
         }
-
-        .score-box, .best-box {
-            background: #ffffffcc;
-            backdrop-filter: blur(2px);
-            padding: 8px 20px;
-            border-radius: 60px;
-            font-weight: 600;
-            color: #4b6a5c;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        .header h1 {
+            font-size: 2rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #ebd5b3, #cfb284);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 500;
         }
-
-        .score-box span, .best-box span {
-            font-size: 1rem;
+        .sub {
+            color: #b4afa0;
+            font-size: 0.85rem;
             letter-spacing: 1px;
         }
 
-        .score-value, .best-value {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-left: 8px;
-            color: #3a5e4e;
+        /* две колонки: радио + плейлист */
+        .columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-top: 12px;
+        }
+        .radio-col {
+            flex: 1.5;
+            min-width: 250px;
+        }
+        .playlist-col {
+            flex: 1;
+            min-width: 220px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 34px;
+            padding: 16px;
+            backdrop-filter: blur(6px);
         }
 
-        .reset-btn {
-            background: #e6d5b8;
-            border: none;
-            font-size: 1.2rem;
-            padding: 6px 20px;
-            border-radius: 60px;
-            font-weight: 600;
-            color: #5a4a2e;
-            cursor: pointer;
-            transition: 0.2s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-        }
-
-        .reset-btn:hover {
-            background: #d9c6a3;
-            transform: scale(0.96);
-        }
-
-        /* Игровое поле */
-        canvas {
-            display: block;
-            margin: 0 auto;
-            background: #dde9e0;
-            border-radius: 40px;
-            cursor: pointer;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
-            width: 100%;
-            height: auto;
-        }
-
-        .message {
-            text-align: center;
-            padding: 16px 12px 6px 12px;
-            font-size: 0.9rem;
-            color: #8faa9b;
+        .section-title {
+            color: #ddcca8;
             font-weight: 500;
+            margin-bottom: 14px;
+            border-left: 3px solid #c0a86a;
+            padding-left: 12px;
+            font-size: 1.2rem;
         }
 
-        .message i {
-            font-style: normal;
-            display: inline-block;
-            animation: float 2s infinite;
+        /* видео-рамка (радио) */
+        .video-wrapper {
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+            background: #00000040;
+        }
+        iframe {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border: none;
+            display: block;
         }
 
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-3px); }
-            100% { transform: translateY(0px); }
+        /* контролы для радио (на самом деле кнопки для youtube api) */
+        .controls {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin-top: 18px;
+        }
+        .ctrl-btn {
+            background: #23282ec9;
+            border: none;
+            font-size: 1.5rem;
+            padding: 8px 18px;
+            border-radius: 48px;
+            color: #ede0c8;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            transition: 0.2s;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        }
+        .ctrl-btn:hover {
+            background: #3d3e44d9;
+            transform: scale(0.96);
+            color: #ffefcf;
+        }
+
+        /* плейлист */
+        .track-list {
+            list-style: none;
+            margin-top: 10px;
+        }
+        .track-list li {
+            background: rgba(30, 35, 40, 0.7);
+            margin: 8px 0;
+            padding: 10px 14px;
+            border-radius: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.15s;
+            color: #ded7c0;
+            font-weight: 500;
+            font-size: 0.9rem;
+            border: 1px solid #52554430;
+        }
+        .track-list li:hover {
+            background: #3e3b30a0;
+            transform: translateX(4px);
+        }
+        .track-name {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .badge {
+            background: #6a5c3e;
+            padding: 2px 8px;
+            border-radius: 60px;
+            font-size: 0.65rem;
+            color: #f9edd2;
+        }
+
+        .now-playing {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            text-align: center;
+            background: #00000033;
+            padding: 7px;
+            border-radius: 60px;
+            color: #bbaa83;
         }
 
         footer {
             text-align: center;
+            margin-top: 20px;
             font-size: 0.7rem;
-            color: #bcafa0;
-            margin-top: 12px;
+            color: #6e6a5a;
         }
 
-        @media (max-width: 600px) {
-            .score-value, .best-value {
-                font-size: 1.5rem;
-            }
-            .game-wrapper {
-                padding: 12px;
-            }
-            .stats {
-                padding: 6px 8px;
+        @media (max-width: 700px) {
+            .ctrl-btn {
+                padding: 6px 14px;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
-<div class="game-wrapper">
-    <div class="game-container">
-        <div class="stats">
-            <div class="score-box">
-                <span>🍃 поймано</span>
-                <span class="score-value" id="scoreValue">0</span>
-            </div>
-            <div class="best-box">
-                <span>✨ рекорд</span>
-                <span class="best-value" id="bestValue">0</span>
-            </div>
-            <button class="reset-btn" id="resetGame">⟳ начать заново</button>
+<div class="player-card">
+    <div class="container">
+        <div class="header">
+            <h1>🎧  lofi梦境  ✨</h1>
+            <div class="sub">радио · плейлист · уютная атмосфера</div>
         </div>
 
-        <canvas id="gameCanvas" width="800" height="500" style="width:100%; height:auto; max-width:800px; aspect-ratio:800/500"></canvas>
+        <div class="columns">
+            <!-- левая колонка: радио + управление -->
+            <div class="radio-col">
+                <div class="section-title">📻 лоуфай радио (live 24/7)</div>
+                <div class="video-wrapper" id="youtubePlayer">
+                    <!-- плеер youtube будет вставлен сюда -->
+                </div>
+                <div class="controls">
+                    <button class="ctrl-btn" id="playRadioBtn">▶ Play радио</button>
+                    <button class="ctrl-btn" id="pauseRadioBtn">⏸ Пауза</button>
+                </div>
+                <div class="now-playing" id="nowPlayingText">
+                    🎵 сейчас: лоуфай радиопоток
+                </div>
+            </div>
 
-        <div class="message">
-            ☁️ нажимай на облака, листья и звёзды · лови спокойствие 🧘
+            <!-- правая колонка: кастомный плейлист -->
+            <div class="playlist-col">
+                <div class="section-title">📀 твой плейлист</div>
+                <ul class="track-list" id="trackList">
+                    <!-- треки (можно добавить свои id youtube) -->
+                    <li data-video="jfKfPfyJRdk">
+                        <span class="track-name">🎹 lofi girl · beats to relax/study</span>
+                        <span class="badge">radio</span>
+                    </li>
+                    <li data-video="5qap5aO4i9A">
+                        <span class="track-name">🌙 lofi hip hop mix — night vibes</span>
+                        <span class="badge">mix</span>
+                    </li>
+                    <li data-video="7NOSDKb0HlU">
+                        <span class="track-name">🍃 jazzhop & lofi — rainy day</span>
+                        <span class="badge">chill</span>
+                    </li>
+                    <li data-video="rUxyKA_-M14">
+                        <span class="track-name">☕ study session · lofi beats</span>
+                        <span class="badge">focus</span>
+                    </li>
+                    <li data-video="LWxY0nJztAM">
+                        <span class="track-name">🎧 lo-fi hip hop radio – beats to sleep</span>
+                        <span class="badge">sleep</span>
+                    </li>
+                </ul>
+                <div class="now-playing" style="margin-top: 12px;">
+                    💿 кликни на трек — воспроизведение сразу начнётся
+                </div>
+            </div>
         </div>
-        <footer>✧ медленно и с душой ✧</footer>
+        <footer>⏾ слушай в удовольствие ⏾  ·  лоуфай комната с твоим настроением</footer>
     </div>
 </div>
 
 <script>
-    (function(){
-        // ---------- НАСТРОЙКИ ----------
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
+    // YouTube API
+    let player;
+    let isPlayerReady = false;
+    let currentVideoId = "jfKfPfyJRdk";   // стартовое радио (lofi girl)
 
-        // Размеры (фикс 800x500)
-        canvas.width = 800;
-        canvas.height = 500;
+    // Загружаем API YouTube
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
-        let score = 0;
-        let bestScore = localStorage.getItem('calmBest') ? parseInt(localStorage.getItem('calmBest')) : 0;
-        document.getElementById('scoreValue').innerText = score;
-        document.getElementById('bestValue').innerText = bestScore;
-
-        // Массив объектов: x, y, radius, type, speedX, speedY
-        let items = [];
-        const MAX_ITEMS = 13;
-        const SPAWN_RATE = 48; // кадров между спавнами
-        let frameCounter = 0;
-
-        // Типы предметов (спокойные, приятные)
-        const TYPES = [
-            { name: 'cloud',  emoji: '☁️', color1: '#f0f4fa', color2: '#d9e3ed', radius: 24, points: 1 },
-            { name: 'leaf',   emoji: '🍃', color1: '#bdd4a5', color2: '#9aba7b', radius: 18, points: 1 },
-            { name: 'star',   emoji: '✨', color1: '#f9eec1', color2: '#f3dd8c', radius: 16, points: 1 },
-            { name: 'petal',  emoji: '🌸', color1: '#f9cfd8', color2: '#f5b0c1', radius: 15, points: 1 },
-            { name: 'feather',emoji: '🕊️', color1: '#e6dfcd', color2: '#dacbaa', radius: 17, points: 1 }
-        ];
-
-        // Обновляем рекорд
-        function updateBestUI() {
-            document.getElementById('bestValue').innerText = bestScore;
-            if(score > bestScore) {
-                bestScore = score;
-                localStorage.setItem('calmBest', bestScore);
-                document.getElementById('bestValue').innerText = bestScore;
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtubePlayer', {
+            height: '360',
+            width: '100%',
+            videoId: currentVideoId,
+            playerVars: {
+                'autoplay': 1,
+                'loop': 1,
+                'controls': 0,
+                'disablekb': 0,
+                'playsinline': 1,
+                'rel': 0,
+                'modestbranding': 1
+            },
+            events: {
+                'onReady': onPlayerReady,
+                'onStateChange': onPlayerStateChange
             }
+        });
+    }
+
+    function onPlayerReady(event) {
+        isPlayerReady = true;
+        event.target.playVideo();
+        document.getElementById('nowPlayingText').innerHTML = '🎵 сейчас: лоуфай радио · lofi girl';
+    }
+
+    function onPlayerStateChange(event) {
+        if (event.data == YT.PlayerState.PLAYING) {
+            // обновим текст в зависимости от видео
+            updateNowPlayingText();
         }
+    }
 
-        // Добавить новый "спокойный" предмет
-        function spawnItem() {
-            if(items.length >= MAX_ITEMS) return;
+    function updateNowPlayingText() {
+        const tracks = {
+            'jfKfPfyJRdk': '🎵 lofi girl · beats to relax/study',
+            '5qap5aO4i9A': '🌙 night vibes · lo-fi hip hop mix',
+            '7NOSDKb0HlU': '🍃 rainy day · jazzhop & lofi',
+            'rUxyKA_-M14': '☕ study session · lofi beats',
+            'LWxY0nJztAM': '🎧 beats to sleep · calm lofi'
+        };
+        const text = tracks[currentVideoId] || '🎵 лоуфай поток';
+        document.getElementById('nowPlayingText').innerHTML = `🎶 ${text}`;
+    }
 
-            const type = TYPES[Math.floor(Math.random() * TYPES.length)];
-            let radius = type.radius;
-            // появляется за границей канваса, плавно залетает
-            let side = Math.floor(Math.random() * 4); // 0:лево,1:право,2:верх,3:низ
-            let x, y;
-            if(side === 0) { // слева
-                x = -radius - 2;
-                y = 30 + Math.random() * (canvas.height - 60);
-            } else if(side === 1) { // справа
-                x = canvas.width + radius + 2;
-                y = 30 + Math.random() * (canvas.height - 60);
-            } else if(side === 2) { // сверху
-                x = 20 + Math.random() * (canvas.width - 40);
-                y = -radius - 2;
-            } else { // снизу
-                x = 20 + Math.random() * (canvas.width - 40);
-                y = canvas.height + radius + 2;
+    // Функции управления
+    function playRadio() {
+        if(player && isPlayerReady) {
+            player.playVideo();
+        }
+    }
+    function pauseRadio() {
+        if(player && isPlayerReady) {
+            player.pauseVideo();
+        }
+    }
+
+    // Переключение на другой трек (меняем videoId)
+    function loadTrack(videoId) {
+        if(!player || !isPlayerReady) return;
+        currentVideoId = videoId;
+        player.loadVideoById(videoId);
+        player.playVideo();
+        updateNowPlayingText();
+    }
+
+    // события кнопок
+    document.getElementById('playRadioBtn').addEventListener('click', playRadio);
+    document.getElementById('pauseRadioBtn').addEventListener('click', pauseRadio);
+
+    // обработка кликов по плейлисту
+    const tracks = document.querySelectorAll('#trackList li');
+    tracks.forEach(track => {
+        track.addEventListener('click', () => {
+            const videoId = track.getAttribute('data-video');
+            if(videoId) {
+                loadTrack(videoId);
             }
-
-            // очень медленная, расслабляющая скорость
-            let speedX = (Math.random() - 0.5) * 0.45;
-            let speedY = (Math.random() - 0.5) * 0.45;
-            // чтобы совсем не вязли, минимальный дрейф
-            if(Math.abs(speedX) < 0.15) speedX += (Math.random() - 0.5)*0.2;
-            if(Math.abs(speedY) < 0.15) speedY += (Math.random() - 0.5)*0.2;
-            // ограничим max скорость 0.9
-            speedX = Math.min(Math.max(speedX, -0.9), 0.9);
-            speedY = Math.min(Math.max(speedY, -0.9), 0.9);
-
-            items.push({
-                x: x, y: y, radius: radius, type: type,
-                vx: speedX, vy: speedY
-            });
-        }
-
-        // обновление позиций
-        function updateItems() {
-            for(let i=0; i<items.length; i++) {
-                const it = items[i];
-                it.x += it.vx;
-                it.y += it.vy;
-                // если улетел далеко за край - удаляем
-                if(it.x + it.radius < -100 || it.x - it.radius > canvas.width + 100 ||
-                   it.y + it.radius < -100 || it.y - it.radius > canvas.height + 100) {
-                    items.splice(i,1);
-                    i--;
-                }
-            }
-        }
-
-        // Рисуем градиент + плавные тени
-        function drawItem(item) {
-            ctx.save();
-            ctx.shadowBlur = 6;
-            ctx.shadowColor = "rgba(90, 70, 40, 0.1)";
-            const grad = ctx.createLinearGradient(item.x-6, item.y-6, item.x+6, item.y+6);
-            grad.addColorStop(0, item.type.color1);
-            grad.addColorStop(1, item.type.color2);
-            ctx.beginPath();
-            ctx.arc(item.x, item.y, item.radius-1, 0, Math.PI*2);
-            ctx.fillStyle = grad;
-            ctx.fill();
-            ctx.shadowBlur = 2;
-            ctx.font = `${item.radius+6}px "Segoe UI Emoji", "Apple Color Emoji", system-ui, sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#2c3e2b";
-            ctx.fillText(item.type.emoji, item.x+1, item.y+1);
-            ctx.fillStyle = "#fefaf0";
-            ctx.fillText(item.type.emoji, item.x, item.y);
-            ctx.restore();
-        }
-
-        function drawBackground() {
-            // Спокойный градиентный фон поля
-            const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            grad.addColorStop(0, '#e0f0e6');
-            grad.addColorStop(1, '#cfe2cf');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            // очень лёгкие облачка-узоры
-            ctx.fillStyle = "#e4f3e8";
-            for(let i=0;i<12;i++) {
-                ctx.beginPath();
-                ctx.ellipse(70+(i*97)%canvas.width, 420+(i*27)%100, 35, 20, 0, 0, Math.PI*2);
-                ctx.fill();
-            }
-            ctx.fillStyle = "#ccddc5";
-            for(let i=0;i<8;i++) {
-                ctx.beginPath();
-                ctx.ellipse(40+(i*131)%canvas.width, 80+(i*19)%70, 28, 18, 0, 0, Math.PI*2);
-                ctx.fill();
-            }
-        }
-
-        function draw() {
-            drawBackground();
-            for(let item of items) {
-                drawItem(item);
-            }
-            // простая подпись в углу для уюта
-            ctx.font = "11px 'Segoe UI'";
-            ctx.fillStyle = "#86a081";
-            ctx.shadowBlur = 0;
-            ctx.fillText("◌ вдох-выдох ◌", canvas.width-85, canvas.height-8);
-        }
-
-        // Обработка клика (поймать спокойствие)
-        function handleCatch(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;   // canvas реальный 800 / отображаемая ширина
-            const scaleY = canvas.height / rect.height;
-
-            let clientX, clientY;
-            if(e.touches) {
-                // тач
-                clientX = e.touches[0].clientX;
-                clientY = e.touches[0].clientY;
-                e.preventDefault();
-            } else {
-                clientX = e.clientX;
-                clientY = e.clientY;
-            }
-
-            let canvasX = (clientX - rect.left) * scaleX;
-            let canvasY = (clientY - rect.top) * scaleY;
-
-            // ищем предмет по радиусу
-            for(let i=0; i<items.length; i++) {
-                const it = items[i];
-                const dx = canvasX - it.x;
-                const dy = canvasY - it.y;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if(dist <= it.radius + 5) {
-                    // поймали!
-                    score += it.type.points;
-                    document.getElementById('scoreValue').innerText = score;
-                    updateBestUI();
-
-                    // маленький приятный визуальный эффект
-                    items.splice(i,1);
-                    // мягкий фидбек - легкое мерцание (можно кастом)
-                    canvas.style.transition = '0.05s linear';
-                    canvas.style.filter = 'drop-shadow(0 0 6px #b7d968)';
-                    setTimeout(() => { canvas.style.filter = ''; }, 100);
-                    break;
-                }
-            }
-        }
-
-        // Сброс игры
-        function resetGame() {
-            score = 0;
-            document.getElementById('scoreValue').innerText = "0";
-            items = [];
-            frameCounter = 0;
-            updateBestUI();  // сохранит рекорд, но не обнулит лучший
-        }
-
-        // Цикл анимации
-        function animate() {
-            updateItems();
-            // спавн новых предметов
-            frameCounter++;
-            if(frameCounter >= SPAWN_RATE && items.length < MAX_ITEMS) {
-                spawnItem();
-                frameCounter = 0;
-                // изредка дополнительный спавн для лёгкой динамики
-                if(items.length < 5 && Math.random()<0.3) spawnItem();
-            } else if(frameCounter >= SPAWN_RATE+15) {
-                frameCounter = 0;
-            }
-
-            draw();
-            requestAnimationFrame(animate);
-        }
-
-        // Инициализация событий
-        function init() {
-            // создадим несколько предметов на старте, чтобы не скучно
-            for(let i=0;i<4;i++) {
-                spawnItem();
-            }
-            animate();
-
-            canvas.addEventListener('click', handleCatch);
-            canvas.addEventListener('touchstart', handleCatch, {passive: false});
-            document.getElementById('resetGame').addEventListener('click', () => {
-                resetGame();
-            });
-        }
-
-        init();
-    })();
+        });
+    });
 </script>
 </body>
 </html>
