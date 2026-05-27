@@ -9,7 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent; /* убирает синее на телефонах */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
@@ -65,11 +65,10 @@
         .video-overlay {
             position: relative;
             width: 100%;
-            user-select: none;           /* запрет выделения */
-            outline: none;               /* убираем outline */
+            user-select: none;
+            outline: none;
         }
 
-        /* прозрачный слой поверх видео */
         .video-overlay::after {
             content: "";
             position: absolute;
@@ -97,34 +96,110 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 24px;
+            gap: 30px;
             flex-wrap: wrap;
             margin: 20px 0 12px;
         }
 
-        .btn {
-            background: #2a2f34cc;
+        /* ========== НОВАЯ КНОПКА PLAY/PAUSE ========== */
+        .play-pause-btn {
+            background: linear-gradient(145deg, #2a2f34, #1e2227);
             border: none;
-            font-size: 1.3rem;
-            font-weight: 500;
-            padding: 8px 26px;
-            border-radius: 60px;
-            color: #f0e2c5;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
             cursor: pointer;
-            backdrop-filter: blur(8px);
-            transition: 0.2s;
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            position: relative;
         }
 
-        .btn:hover {
-            background: #3f444bd9;
+        .play-pause-btn:hover {
+            transform: scale(1.05);
+            background: linear-gradient(145deg, #3a4047, #2a2f34);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+        }
+
+        .play-pause-btn:active {
             transform: scale(0.96);
-            color: #fff3df;
         }
 
+        /* анимация пульсации */
+        .play-pause-btn::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(207, 177, 119, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .play-pause-btn:active::before {
+            opacity: 1;
+            animation: pulse 0.4s ease-out;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* иконки через CSS (треугольник и две полоски) */
+        .play-icon, .pause-icon {
+            display: block;
+            transition: all 0.2s ease;
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 14px 0 14px 22px;
+            border-color: transparent transparent transparent #f0e2c5;
+            margin-left: 6px;
+        }
+
+        .pause-icon {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pause-icon span {
+            display: block;
+            width: 7px;
+            height: 22px;
+            background-color: #f0e2c5;
+            border-radius: 2px;
+        }
+
+        /* скрываем/показываем иконки */
+        .play-pause-btn.paused .play-icon {
+            display: block;
+        }
+        .play-pause-btn.paused .pause-icon {
+            display: none;
+        }
+        .play-pause-btn:not(.paused) .play-icon {
+            display: none;
+        }
+        .play-pause-btn:not(.paused) .pause-icon {
+            display: flex;
+        }
+
+        /* громкость */
         .volume-wrap {
             display: flex;
             align-items: center;
@@ -156,6 +231,11 @@
             background: #f3dfb2;
             border-radius: 50%;
             cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
 
         .volume-value {
@@ -184,7 +264,9 @@
 
         @media (max-width: 550px) {
             .lofi-card { padding: 18px; }
-            .btn { padding: 6px 18px; font-size: 1rem; }
+            .play-pause-btn { width: 60px; height: 60px; }
+            .play-icon { border-width: 12px 0 12px 18px; }
+            .pause-icon span { width: 6px; height: 18px; }
             .volume-wrap { padding: 4px 14px; }
             input[type="range"] { width: 100px; }
         }
@@ -204,8 +286,15 @@
     </div>
 
     <div class="controls-panel">
-        <button class="btn" id="playBtn">▶ Play</button>
-        <button class="btn" id="pauseBtn">⏸ Пауза</button>
+        <!-- новая единая кнопка Play/Pause -->
+        <button class="play-pause-btn paused" id="playPauseBtn">
+            <span class="play-icon"></span>
+            <span class="pause-icon">
+                <span></span>
+                <span></span>
+            </span>
+        </button>
+
         <div class="volume-wrap">
             <span class="volume-icon">🔊</span>
             <input type="range" id="volumeSlider" min="0" max="100" value="70">
@@ -222,6 +311,7 @@
 <script>
     let player;
     let isPlayerReady = false;
+    let isPlaying = true;  // видео стартует автоматически
     const VIDEO_ID = "5yx6BWlEVcY";
 
     const tag = document.createElement('script');
@@ -252,6 +342,12 @@
     function onPlayerReady(event) {
         isPlayerReady = true;
         event.target.playVideo();
+        isPlaying = true;
+        
+        // устанавливаем правильное состояние кнопки (убираем класс paused, так как играет)
+        const btn = document.getElementById('playPauseBtn');
+        btn.classList.remove('paused');
+        
         const volumeSlider = document.getElementById('volumeSlider');
         const volumeVal = volumeSlider ? parseInt(volumeSlider.value) : 70;
         player.setVolume(volumeVal);
@@ -263,12 +359,21 @@
         }
     }
 
-    function playMusic() {
-        if (player && isPlayerReady) player.playVideo();
-    }
-
-    function pauseMusic() {
-        if (player && isPlayerReady) player.pauseVideo();
+    // переключение play/pause
+    function togglePlayPause() {
+        if (!player || !isPlayerReady) return;
+        
+        const btn = document.getElementById('playPauseBtn');
+        
+        if (isPlaying) {
+            player.pauseVideo();
+            isPlaying = false;
+            btn.classList.add('paused');
+        } else {
+            player.playVideo();
+            isPlaying = true;
+            btn.classList.remove('paused');
+        }
     }
 
     function setVolume(volumeLevel) {
@@ -282,8 +387,8 @@
         if (volumeValueSpan) volumeValueSpan.innerText = val + '%';
     }
 
-    document.getElementById('playBtn').addEventListener('click', playMusic);
-    document.getElementById('pauseBtn').addEventListener('click', pauseMusic);
+    // обработчики
+    document.getElementById('playPauseBtn').addEventListener('click', togglePlayPause);
 
     const volumeSlider = document.getElementById('volumeSlider');
     if (volumeSlider) {
