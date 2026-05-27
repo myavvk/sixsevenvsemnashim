@@ -57,13 +57,14 @@
             letter-spacing: 0.5px;
         }
 
-        /* видеоплеер */
+        /* видеоплеер - теперь вообще без интерфейса */
         .video-container {
             border-radius: 42px;
             overflow: hidden;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
             background: #00000030;
             margin: 20px 0 18px;
+            position: relative;
         }
 
         iframe {
@@ -71,6 +72,7 @@
             aspect-ratio: 16 / 9;
             border: none;
             display: block;
+            pointer-events: none; /* ❗ КЛЮЧЕВОЙ МОМЕНТ: отключает все наведения на видео */
         }
 
         /* панель управления */
@@ -219,10 +221,8 @@
 <script>
     let player;
     let isPlayerReady = false;
-    // рабочий, стабильный стрим с лоуфаем (без ограничений встраивания)
     const VIDEO_ID = "5yx6BWlEVcY";
 
-    // подключаем YouTube API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
@@ -234,11 +234,13 @@
             videoId: VIDEO_ID,
             playerVars: {
                 'autoplay': 1,
-                'controls': 0,       // скрываем стандартные кнопки, оставим свои
+                'controls': 0,
                 'rel': 0,
                 'modestbranding': 1,
                 'disablekb': 1,
-                'playsinline': 1
+                'playsinline': 1,
+                'showinfo': 0,
+                'iv_load_policy': 3      // отключает аннотации
             },
             events: {
                 'onReady': onPlayerReady
@@ -249,14 +251,20 @@
     function onPlayerReady(event) {
         isPlayerReady = true;
         event.target.playVideo();
-        // установим громкость из слайдера (по умолчанию 70%)
         const volumeSlider = document.getElementById('volumeSlider');
         const volumeVal = volumeSlider ? parseInt(volumeSlider.value) : 70;
         player.setVolume(volumeVal);
         updateVolumeText(volumeVal);
+        
+        // дополнительно скрываем всё лишнее через CSS (если что-то останется)
+        setTimeout(() => {
+            const iframe = document.querySelector('#youtubePlayer iframe');
+            if(iframe) {
+                iframe.style.pointerEvents = 'none';
+            }
+        }, 100);
     }
 
-    // управление
     function playMusic() {
         if (player && isPlayerReady) player.playVideo();
     }
@@ -276,7 +284,6 @@
         if (volumeValueSpan) volumeValueSpan.innerText = val + '%';
     }
 
-    // --- обработчики ---
     document.getElementById('playBtn').addEventListener('click', playMusic);
     document.getElementById('pauseBtn').addEventListener('click', pauseMusic);
 
@@ -288,20 +295,6 @@
             setVolume(vol);
         });
     }
-
-    // меняем статус (ради красоты)
-    function updateStatusMessage() {
-        const statusDiv = document.getElementById('nowPlayingStatus');
-        if (statusDiv) {
-            statusDiv.innerHTML = '🎶 сейчас: лоуфай радио · расслабляющий микс';
-        }
-    }
-
-    setInterval(() => {
-        if (player && isPlayerReady && player.getPlayerState() === YT.PlayerState.PLAYING) {
-            updateStatusMessage();
-        }
-    }, 3000);
 </script>
 </body>
 </html>
