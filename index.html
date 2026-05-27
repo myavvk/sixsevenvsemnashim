@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- ЗАПРЕТ МАСШТАБИРОВАНИЯ (основной тег) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8, user-scalable=no, shrink-to-fit=no, maximum-scale=0.8">
     <title>lo-fi room | Станция Лоуфая</title>
     <style>
         * {
@@ -13,6 +12,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* УСТАНАВЛИВАЕМ МАСШТАБ 80% ДЛЯ ВСЕЙ СТРАНИЦЫ */
         body {
             min-height: 100vh;
             background: linear-gradient(135deg, #0f0c1f, #1a0f1a, #0a0a1a, #050510);
@@ -23,11 +23,15 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
-            /* запрет масштабирования через CSS */
-            touch-action: pan-y pinch-zoom; /* разрешаем только вертикальный скролл, но не зумирование */
+            touch-action: pan-y;
+            zoom: 0.8;           /* масштаб 80% для браузеров на ПК */
+            -moz-transform: scale(0.8);  /* для Firefox */
+            transform: scale(0.8);
+            transform-origin: center center;
+            width: 125%;          /* компенсируем масштаб, чтобы не было пустых полей */
+            height: 125%;
         }
 
-        /* полный запрет масштабирования через zoom */
         html {
             zoom: reset;
             -moz-text-size-adjust: none;
@@ -57,7 +61,6 @@
             margin-bottom: 22px;
         }
 
-        /* АНИМИРОВАННОЕ НАЗВАНИЕ С СЕРДЕЧКАМИ */
         .header h1 {
             font-size: 2.1rem;
             background: linear-gradient(135deg, #f2e3c9, #cfb177);
@@ -121,7 +124,6 @@
             margin: 20px 0 12px;
         }
 
-        /* КНОПКА PLAY/PAUSE */
         .play-pause-btn {
             background: linear-gradient(145deg, #1e1a2a, #12101c);
             border: 1px solid rgba(180, 130, 180, 0.4);
@@ -210,7 +212,6 @@
             display: flex;
         }
 
-        /* ГОРИЗОНТАЛЬНЫЙ ПОЛЗУНОК */
         .volume-wrap {
             background: rgba(20, 15, 30, 0.7);
             padding: 8px 22px;
@@ -314,8 +315,8 @@
 
         <div class="volume-wrap">
             <div class="volume-control">
-                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
-                <span class="volume-value" id="volumeValue">70%</span>
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="80">
+                <span class="volume-value" id="volumeValue">80%</span>
             </div>
         </div>
     </div>
@@ -366,7 +367,7 @@
         btn.classList.remove('paused');
         
         const volumeSlider = document.getElementById('volumeSlider');
-        const volumeVal = volumeSlider ? parseInt(volumeSlider.value) : 70;
+        const volumeVal = volumeSlider ? parseInt(volumeSlider.value) : 80;
         player.setVolume(volumeVal);
         updateVolumeText(volumeVal);
     }
