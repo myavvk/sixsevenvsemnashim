@@ -46,6 +46,7 @@
             margin-bottom: 22px;
         }
 
+        /* АНИМИРОВАННОЕ НАЗВАНИЕ */
         .header h1 {
             font-size: 2.1rem;
             background: linear-gradient(135deg, #f2e3c9, #cfb177);
@@ -54,6 +55,34 @@
             color: transparent;
             font-weight: 500;
             letter-spacing: 1px;
+            display: inline-block;
+            animation: gentleGlow 2.5s ease-in-out infinite, softFloat 3s ease-in-out infinite;
+        }
+
+        /* мягкое свечение */
+        @keyframes gentleGlow {
+            0% {
+                text-shadow: 0 0 0px rgba(207, 177, 119, 0);
+            }
+            50% {
+                text-shadow: 0 0 8px rgba(207, 177, 119, 0.5), 0 0 2px rgba(255, 235, 190, 0.3);
+            }
+            100% {
+                text-shadow: 0 0 0px rgba(207, 177, 119, 0);
+            }
+        }
+
+        /* лёгкое покачивание */
+        @keyframes softFloat {
+            0% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+            100% {
+                transform: translateY(0px);
+            }
         }
 
         .gif-container {
@@ -255,6 +284,7 @@
 
         @media (max-width: 550px) {
             .lofi-card { padding: 18px; }
+            .header h1 { font-size: 1.6rem; }
             .play-pause-btn { width: 60px; height: 60px; }
             .play-icon { border-width: 12px 0 12px 18px; }
             .pause-icon span { width: 6px; height: 18px; }
@@ -267,7 +297,7 @@
 <body>
 <div class="lofi-card">
     <div class="header">
-        <h1>🎧 Станция Лоуфая &lt;3</h1>
+        <h1>&lt;3 Станция Лоуфая</h1>
     </div>
 
     <!-- ГИФКА SHADOW FIEND -->
