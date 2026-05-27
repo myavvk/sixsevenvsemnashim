@@ -22,7 +22,6 @@
             padding: 20px;
         }
 
-        /* главный плеер-карточка */
         .player-card {
             max-width: 1100px;
             width: 100%;
@@ -30,8 +29,7 @@
             backdrop-filter: blur(18px);
             border-radius: 54px;
             padding: 22px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.08);
-            transition: all 0.2s;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255,245,210,0.2);
         }
 
@@ -42,7 +40,6 @@
             padding: 20px;
         }
 
-        /* шапка */
         .header {
             text-align: center;
             margin-bottom: 20px;
@@ -59,10 +56,8 @@
         .sub {
             color: #b4afa0;
             font-size: 0.85rem;
-            letter-spacing: 1px;
         }
 
-        /* две колонки: радио + плейлист */
         .columns {
             display: flex;
             flex-wrap: wrap;
@@ -79,7 +74,6 @@
             background: rgba(0,0,0,0.3);
             border-radius: 34px;
             padding: 16px;
-            backdrop-filter: blur(6px);
         }
 
         .section-title {
@@ -91,7 +85,6 @@
             font-size: 1.2rem;
         }
 
-        /* видео-рамка (радио) */
         .video-wrapper {
             border-radius: 32px;
             overflow: hidden;
@@ -105,7 +98,6 @@
             display: block;
         }
 
-        /* контролы для радио (на самом деле кнопки для youtube api) */
         .controls {
             display: flex;
             gap: 18px;
@@ -120,21 +112,16 @@
             border-radius: 48px;
             color: #ede0c8;
             cursor: pointer;
-            backdrop-filter: blur(8px);
             transition: 0.2s;
-            font-weight: 500;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
         }
         .ctrl-btn:hover {
             background: #3d3e44d9;
             transform: scale(0.96);
-            color: #ffefcf;
         }
 
-        /* плейлист */
         .track-list {
             list-style: none;
             margin-top: 10px;
@@ -152,23 +139,16 @@
             color: #ded7c0;
             font-weight: 500;
             font-size: 0.9rem;
-            border: 1px solid #52554430;
         }
         .track-list li:hover {
             background: #3e3b30a0;
             transform: translateX(4px);
-        }
-        .track-name {
-            display: flex;
-            gap: 10px;
-            align-items: center;
         }
         .badge {
             background: #6a5c3e;
             padding: 2px 8px;
             border-radius: 60px;
             font-size: 0.65rem;
-            color: #f9edd2;
         }
 
         .now-playing {
@@ -205,14 +185,11 @@
         </div>
 
         <div class="columns">
-            <!-- левая колонка: радио + управление -->
             <div class="radio-col">
                 <div class="section-title">📻 лоуфай радио (live 24/7)</div>
-                <div class="video-wrapper" id="youtubePlayer">
-                    <!-- плеер youtube будет вставлен сюда -->
-                </div>
+                <div class="video-wrapper" id="youtubePlayer"></div>
                 <div class="controls">
-                    <button class="ctrl-btn" id="playRadioBtn">▶ Play радио</button>
+                    <button class="ctrl-btn" id="playRadioBtn">▶ Play</button>
                     <button class="ctrl-btn" id="pauseRadioBtn">⏸ Пауза</button>
                 </div>
                 <div class="now-playing" id="nowPlayingText">
@@ -220,29 +197,27 @@
                 </div>
             </div>
 
-            <!-- правая колонка: кастомный плейлист -->
             <div class="playlist-col">
                 <div class="section-title">📀 твой плейлист</div>
                 <ul class="track-list" id="trackList">
-                    <!-- треки (можно добавить свои id youtube) -->
-                    <li data-video="jfKfPfyJRdk">
-                        <span class="track-name">🎹 lofi girl · beats to relax/study</span>
+                    <li data-video="5yx6BWlEVcY">
+                        <span>🎹 lofi hip hop radio - beats to relax/study</span>
                         <span class="badge">radio</span>
                     </li>
-                    <li data-video="5qap5aO4i9A">
-                        <span class="track-name">🌙 lofi hip hop mix — night vibes</span>
-                        <span class="badge">mix</span>
+                    <li data-video="DWcJFNfaw9c">
+                        <span>🌙 late night lofi - chill beats</span>
+                        <span class="badge">night</span>
                     </li>
-                    <li data-video="7NOSDKb0HlU">
-                        <span class="track-name">🍃 jazzhop & lofi — rainy day</span>
-                        <span class="badge">chill</span>
+                    <li data-video="x8VYWzhRsnw">
+                        <span>🍃 rainy lofi & jazzhop</span>
+                        <span class="badge">rain</span>
                     </li>
-                    <li data-video="rUxyKA_-M14">
-                        <span class="track-name">☕ study session · lofi beats</span>
+                    <li data-video="v6sF2t3sxYo">
+                        <span>☕ study session - lo-fi beats</span>
                         <span class="badge">focus</span>
                     </li>
-                    <li data-video="LWxY0nJztAM">
-                        <span class="track-name">🎧 lo-fi hip hop radio – beats to sleep</span>
+                    <li data-video="hHW1oY26pQ8">
+                        <span>🎧 calm piano lofi - sleep mix</span>
                         <span class="badge">sleep</span>
                     </li>
                 </ul>
@@ -251,21 +226,18 @@
                 </div>
             </div>
         </div>
-        <footer>⏾ слушай в удовольствие ⏾  ·  лоуфай комната с твоим настроением</footer>
+        <footer>⏾ слушай в удовольствие ⏾  ·  лоуфай комната</footer>
     </div>
 </div>
 
 <script>
-    // YouTube API
     let player;
     let isPlayerReady = false;
-    let currentVideoId = "jfKfPfyJRdk";   // стартовое радио (lofi girl)
+    let currentVideoId = "5yx6BWlEVcY";
 
-    // Загружаем API YouTube
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('youtubePlayer', {
@@ -274,10 +246,7 @@
             videoId: currentVideoId,
             playerVars: {
                 'autoplay': 1,
-                'loop': 1,
-                'controls': 0,
-                'disablekb': 0,
-                'playsinline': 1,
+                'controls': 1,
                 'rel': 0,
                 'modestbranding': 1
             },
@@ -291,41 +260,34 @@
     function onPlayerReady(event) {
         isPlayerReady = true;
         event.target.playVideo();
-        document.getElementById('nowPlayingText').innerHTML = '🎵 сейчас: лоуфай радио · lofi girl';
+        updateNowPlayingText();
     }
 
     function onPlayerStateChange(event) {
         if (event.data == YT.PlayerState.PLAYING) {
-            // обновим текст в зависимости от видео
             updateNowPlayingText();
         }
     }
 
     function updateNowPlayingText() {
         const tracks = {
-            'jfKfPfyJRdk': '🎵 lofi girl · beats to relax/study',
-            '5qap5aO4i9A': '🌙 night vibes · lo-fi hip hop mix',
-            '7NOSDKb0HlU': '🍃 rainy day · jazzhop & lofi',
-            'rUxyKA_-M14': '☕ study session · lofi beats',
-            'LWxY0nJztAM': '🎧 beats to sleep · calm lofi'
+            '5yx6BWlEVcY': '🎵 lofi hip hop radio - beats to relax/study',
+            'DWcJFNfaw9c': '🌙 late night lofi - chill beats',
+            'x8VYWzhRsnw': '🍃 rainy lofi & jazzhop',
+            'v6sF2t3sxYo': '☕ study session - lo-fi beats',
+            'hHW1oY26pQ8': '🎧 calm piano lofi - sleep mix'
         };
         const text = tracks[currentVideoId] || '🎵 лоуфай поток';
         document.getElementById('nowPlayingText').innerHTML = `🎶 ${text}`;
     }
 
-    // Функции управления
     function playRadio() {
-        if(player && isPlayerReady) {
-            player.playVideo();
-        }
+        if(player && isPlayerReady) player.playVideo();
     }
     function pauseRadio() {
-        if(player && isPlayerReady) {
-            player.pauseVideo();
-        }
+        if(player && isPlayerReady) player.pauseVideo();
     }
 
-    // Переключение на другой трек (меняем videoId)
     function loadTrack(videoId) {
         if(!player || !isPlayerReady) return;
         currentVideoId = videoId;
@@ -334,18 +296,13 @@
         updateNowPlayingText();
     }
 
-    // события кнопок
     document.getElementById('playRadioBtn').addEventListener('click', playRadio);
     document.getElementById('pauseRadioBtn').addEventListener('click', pauseRadio);
 
-    // обработка кликов по плейлисту
-    const tracks = document.querySelectorAll('#trackList li');
-    tracks.forEach(track => {
+    document.querySelectorAll('#trackList li').forEach(track => {
         track.addEventListener('click', () => {
             const videoId = track.getAttribute('data-video');
-            if(videoId) {
-                loadTrack(videoId);
-            }
+            if(videoId) loadTrack(videoId);
         });
     });
 </script>
