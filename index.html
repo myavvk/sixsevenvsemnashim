@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no, maximum-scale=1.0">
     
-    <!-- FAVICON (значок сайта) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' font-size='70' text-anchor='middle' dy='.35em' fill='%23cfb177'%3E❤️%3C/text%3E%3C/svg%3E">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext x='50%25' y='50%25' font-size='70' text-anchor='middle' dy='.35em' fill='%23cfb177'%3E❤️%3C/text%3E%3C/svg%3E">
     
     <title>❤️ Станция Лоуфая</title>
     <style>
@@ -28,13 +26,6 @@
             align-items: center;
             padding: 20px;
             touch-action: pan-y;
-        }
-
-        html {
-            zoom: reset;
-            -moz-text-size-adjust: none;
-            -webkit-text-size-adjust: none;
-            text-size-adjust: none;
         }
 
         @keyframes gradientShift {
@@ -83,13 +74,14 @@
             100% { transform: translateY(0px); }
         }
 
-        .gif-container {
+        /* КОНТЕЙНЕР С ГИФКОЙ И ВИЗУАЛИЗАЦИЕЙ */
+        .visual-container {
+            position: relative;
             border-radius: 42px;
             overflow: hidden;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.7);
             background: #050510;
             margin: 20px 0 18px;
-            position: relative;
             border: 1px solid rgba(150, 80, 150, 0.4);
         }
 
@@ -100,6 +92,36 @@
             object-fit: cover;
             aspect-ratio: 16 / 9;
             filter: brightness(0.95) contrast(1.05);
+        }
+
+        /* ВИЗУАЛИЗАЦИЯ (накладывается поверх гифки) */
+        .visualization {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 20px 15px 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .visualization-bar {
+            width: 8px;
+            background: linear-gradient(180deg, #cfb177, #ffecb3);
+            border-radius: 4px;
+            transition: height 0.08s ease;
+            box-shadow: 0 0 6px #cfb17755;
+        }
+
+        @media (max-width: 550px) {
+            .visualization-bar { width: 5px; gap: 5px; }
+            .visualization { height: 60px; gap: 5px; }
         }
 
         .hidden-player {
@@ -245,18 +267,11 @@
             box-shadow: 0 0 4px #b77eb7;
         }
 
-        input[type="range"].volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.25);
-            background: #e0bae0;
-        }
-
         .volume-value {
             font-size: 0.75rem;
             color: #b999c9;
             min-width: 40px;
             text-align: center;
-            font-weight: 500;
-            letter-spacing: 0.5px;
         }
 
         .status {
@@ -282,11 +297,8 @@
             .lofi-card { padding: 18px; }
             .header h1 { font-size: 1.5rem; }
             .play-pause-btn { width: 60px; height: 60px; }
-            .play-icon { border-width: 12px 0 12px 18px; }
-            .pause-icon span { width: 6px; height: 18px; }
             .volume-wrap { padding: 5px 16px; }
             input[type="range"].volume-slider { width: 100px; }
-            .controls-panel { gap: 30px; }
         }
     </style>
 </head>
@@ -296,8 +308,13 @@
         <h1>&lt;3 Станция Лоуфая &lt;3</h1>
     </div>
 
-    <div class="gif-container">
-        <img src="https://media1.tenor.com/m/iYTigQdnvI0AAAAd/dota-shadow-fiend.gif" alt="Shadow Fiend lofi vibe">
+    <div class="visual-container">
+        <div class="gif-container">
+            <img src="https://media1.tenor.com/m/iYTigQdnvI0AAAAd/dota-shadow-fiend.gif" alt="Shadow Fiend lofi vibe">
+        </div>
+        <div class="visualization" id="visualization">
+            <!-- 20 полосок визуализации будут созданы через JS -->
+        </div>
     </div>
 
     <div class="hidden-player" id="youtubePlayer"></div>
@@ -322,15 +339,59 @@
     <div class="status" id="nowPlayingStatus">
         🎵 currently playing: lofi hip hop radio
     </div>
-    <footer>⟡ слушай и погружайся ⟡</footer>
+    <footer>⟡ слушай и смотри на волны ⟡</footer>
 </div>
 
 <script>
     let player;
     let isPlayerReady = false;
     let isPlaying = true;
+    let animationRunning = true;
+    let animationId = null;
     const VIDEO_ID = "5yx6BWlEVcY";
 
+    // СОЗДАНИЕ ВИЗУАЛИЗАЦИИ (20 полосок)
+    const visualization = document.getElementById('visualization');
+    const BAR_COUNT = 24;
+    const bars = [];
+
+    for (let i = 0; i < BAR_COUNT; i++) {
+        const bar = document.createElement('div');
+        bar.className = 'visualization-bar';
+        bar.style.height = '4px';
+        visualization.appendChild(bar);
+        bars.push(bar);
+    }
+
+    // Рандомная, но плавная анимация для полосок
+    function animateVisualization() {
+        if (!animationRunning) return;
+        
+        bars.forEach((bar, index) => {
+            // Создаём эффект «волны» и случайные пульсации
+            const time = Date.now() / 280;
+            const sinValue = Math.sin(time + index * 0.35);
+            const randomFactor = Math.sin(time * 1.7 + index) * 0.4;
+            let intensity = (sinValue * 0.6 + 0.4 + randomFactor * 0.3);
+            
+            // Если музыка играет — амплитуда выше, если на паузе — почти ноль
+            if (isPlaying) {
+                intensity = intensity * 0.7 + 0.25;
+            } else {
+                intensity = Math.max(0.05, intensity * 0.12);
+            }
+            
+            const height = Math.max(5, Math.min(55, Math.floor(intensity * 58)));
+            bar.style.height = height + 'px';
+        });
+        
+        animationId = requestAnimationFrame(animateVisualization);
+    }
+
+    // Запускаем визуализацию
+    animateVisualization();
+
+    // YouTube API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
