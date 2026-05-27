@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <!-- ЗАПРЕТ МАСШТАБИРОВАНИЯ (основной тег) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, shrink-to-fit=no, maximum-scale=1.0">
     <title>lo-fi room | Станция Лоуфая</title>
     <style>
         * {
@@ -22,6 +23,16 @@
             justify-content: center;
             align-items: center;
             padding: 20px;
+            /* запрет масштабирования через CSS */
+            touch-action: pan-y pinch-zoom; /* разрешаем только вертикальный скролл, но не зумирование */
+        }
+
+        /* полный запрет масштабирования через zoom */
+        html {
+            zoom: reset;
+            -moz-text-size-adjust: none;
+            -webkit-text-size-adjust: none;
+            text-size-adjust: none;
         }
 
         @keyframes gradientShift {
@@ -59,30 +70,16 @@
             animation: gentleGlow 2.5s ease-in-out infinite, softFloat 3s ease-in-out infinite;
         }
 
-        /* мягкое свечение */
         @keyframes gentleGlow {
-            0% {
-                text-shadow: 0 0 0px rgba(207, 177, 119, 0);
-            }
-            50% {
-                text-shadow: 0 0 8px rgba(207, 177, 119, 0.5), 0 0 2px rgba(255, 235, 190, 0.3);
-            }
-            100% {
-                text-shadow: 0 0 0px rgba(207, 177, 119, 0);
-            }
+            0% { text-shadow: 0 0 0px rgba(207, 177, 119, 0); }
+            50% { text-shadow: 0 0 8px rgba(207, 177, 119, 0.5), 0 0 2px rgba(255, 235, 190, 0.3); }
+            100% { text-shadow: 0 0 0px rgba(207, 177, 119, 0); }
         }
 
-        /* лёгкое покачивание */
         @keyframes softFloat {
-            0% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-3px);
-            }
-            100% {
-                transform: translateY(0px);
-            }
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-3px); }
+            100% { transform: translateY(0px); }
         }
 
         .gif-container {
@@ -300,12 +297,10 @@
         <h1>&lt;3 Станция Лоуфая &lt;3</h1>
     </div>
 
-    <!-- ГИФКА SHADOW FIEND -->
     <div class="gif-container">
         <img src="https://media1.tenor.com/m/iYTigQdnvI0AAAAd/dota-shadow-fiend.gif" alt="Shadow Fiend lofi vibe">
     </div>
 
-    <!-- СКРЫТЫЙ YOUTUBE ПЛЕЕР (только звук) -->
     <div class="hidden-player" id="youtubePlayer"></div>
 
     <div class="controls-panel">
@@ -335,9 +330,8 @@
     let player;
     let isPlayerReady = false;
     let isPlaying = true;
-    const VIDEO_ID = "5yx6BWlEVcY";  // лоуфай-радио
+    const VIDEO_ID = "5yx6BWlEVcY";
 
-    // загружаем YouTube API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
