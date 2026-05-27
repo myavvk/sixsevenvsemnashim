@@ -61,7 +61,8 @@
             margin-top: 6px;
         }
 
-        .video-container {
+        /* контейнер с гифкой */
+        .gif-container {
             border-radius: 42px;
             overflow: hidden;
             box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
@@ -70,34 +71,24 @@
             position: relative;
         }
 
-        .video-overlay {
-            position: relative;
+        .gif-container img {
             width: 100%;
-            user-select: none;
-            outline: none;
-        }
-
-        .video-overlay::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            z-index: 10;
-            cursor: default;
-            pointer-events: all;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        iframe {
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            border: none;
+            height: auto;
             display: block;
+            object-fit: cover;
+            aspect-ratio: 16 / 9;
+        }
+
+        /* скрытый YouTube-плеер */
+        .hidden-player {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
             pointer-events: none;
+            overflow: hidden;
+            top: -9999px;
+            left: -9999px;
         }
 
         .controls-panel {
@@ -197,7 +188,7 @@
             display: flex;
         }
 
-        /* ===== ВЕРТИКАЛЬНЫЙ ПОЛЗУНОК ГРОМКОСТИ (без иконки) ===== */
+        /* ===== ВЕРТИКАЛЬНЫЙ ПОЛЗУНОК ===== */
         .volume-wrap {
             display: flex;
             align-items: center;
@@ -208,7 +199,13 @@
             backdrop-filter: blur(4px);
         }
 
-        /* вертикальный range slider */
+        .volume-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
         input[type="range"].volume-slider {
             writing-mode: bt-lr;
             -webkit-appearance: slider-vertical;
@@ -220,7 +217,6 @@
             cursor: pointer;
         }
 
-        /* для WebKit (Chrome, Safari, Edge) */
         input[type="range"].volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
@@ -229,7 +225,6 @@
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 0 4px rgba(0,0,0,0.3);
         }
 
         input[type="range"].volume-slider::-webkit-slider-thumb:hover {
@@ -237,7 +232,6 @@
             background: #f0e2c5;
         }
 
-        /* для Firefox */
         input[type="range"].volume-slider::-moz-range-track {
             width: 4px;
             height: 80px;
@@ -257,17 +251,8 @@
         .volume-value {
             font-size: 0.7rem;
             color: #a89a7a;
-            margin-top: 6px;
             text-align: center;
             min-width: 35px;
-        }
-
-        /* вертикальный контейнер для ползунка и цифры */
-        .volume-vertical {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
         }
 
         .status {
@@ -306,11 +291,13 @@
         <div class="sub">медленный поток · успокаивающие биты</div>
     </div>
 
-    <div class="video-container">
-        <div class="video-overlay">
-            <div id="youtubePlayer"></div>
-        </div>
+    <!-- ГИФКА (видимая часть) -->
+    <div class="gif-container">
+        <img src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWZ6a3Z4bHZ4cG5oNHF1bHR1cGg0dWp2cDMyZzZ6ZzZ6ZzZ6ZzZ6&ep=v1_gifs_search&rid=200.gif&ct=g" alt="lofi relaxation gif" id="loFiGif">
     </div>
+
+    <!-- СКРЫТЫЙ YouTube-плеер (только звук) -->
+    <div class="hidden-player" id="youtubePlayer"></div>
 
     <div class="controls-panel">
         <button class="play-pause-btn paused" id="playPauseBtn">
@@ -339,16 +326,17 @@
     let player;
     let isPlayerReady = false;
     let isPlaying = true;
-    const VIDEO_ID = "5yx6BWlEVcY";
+    const VIDEO_ID = "5yx6BWlEVcY";  // лоуфай радио
 
+    // загружаем YouTube API
     const tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     document.head.appendChild(tag);
 
     function onYouTubeIframeAPIReady() {
         player = new YT.Player('youtubePlayer', {
-            height: '360',
-            width: '100%',
+            width: '1',
+            height: '1',
             videoId: VIDEO_ID,
             playerVars: {
                 'autoplay': 1,
@@ -378,11 +366,6 @@
         const volumeVal = volumeSlider ? parseInt(volumeSlider.value) : 70;
         player.setVolume(volumeVal);
         updateVolumeText(volumeVal);
-        
-        const iframe = document.querySelector('#youtubePlayer iframe');
-        if (iframe) {
-            iframe.style.pointerEvents = 'none';
-        }
     }
 
     function togglePlayPause() {
