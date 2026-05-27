@@ -9,6 +9,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* убирает синее на телефонах */
         }
 
         body {
@@ -52,7 +53,6 @@
             margin-top: 6px;
         }
 
-        /* контейнер для видео */
         .video-container {
             border-radius: 42px;
             overflow: hidden;
@@ -62,13 +62,14 @@
             position: relative;
         }
 
-        /* специальная обёртка, которая перехватывает наведение */
         .video-overlay {
             position: relative;
             width: 100%;
+            user-select: none;           /* запрет выделения */
+            outline: none;               /* убираем outline */
         }
 
-        /* наложение поверх видео — НЕ даёт кликать на кнопки YouTube */
+        /* прозрачный слой поверх видео */
         .video-overlay::after {
             content: "";
             position: absolute;
@@ -79,7 +80,9 @@
             background: transparent;
             z-index: 10;
             cursor: default;
-            pointer-events: all;  /* блокируем доступ к видео */
+            pointer-events: all;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         iframe {
@@ -87,7 +90,7 @@
             aspect-ratio: 16 / 9;
             border: none;
             display: block;
-            pointer-events: none; /* дополнительная блокировка */
+            pointer-events: none;
         }
 
         .controls-panel {
@@ -254,7 +257,6 @@
         player.setVolume(volumeVal);
         updateVolumeText(volumeVal);
         
-        // полностью отключаем все события мыши на iframe
         const iframe = document.querySelector('#youtubePlayer iframe');
         if (iframe) {
             iframe.style.pointerEvents = 'none';
