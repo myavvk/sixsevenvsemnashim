@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>lo-fi room | музыка для души</title>
+    <title>lo-fi room | Shadow Fiend vibes</title>
     <style>
         * {
             margin: 0;
@@ -14,7 +14,7 @@
 
         body {
             min-height: 100vh;
-            background: linear-gradient(135deg, #1a2a2a, #2a1a2a, #1a2a3a, #0f191c);
+            background: linear-gradient(135deg, #0f0c1f, #1a0f1a, #0a0a1a, #050510);
             background-size: 400% 400%;
             animation: gradientShift 12s ease infinite;
             font-family: 'Segoe UI', 'Quicksand', system-ui, -apple-system, sans-serif;
@@ -33,12 +33,12 @@
         .lofi-card {
             max-width: 950px;
             width: 100%;
-            background: rgba(16, 22, 26, 0.55);
+            background: rgba(0, 0, 0, 0.65);
             backdrop-filter: blur(20px);
             border-radius: 56px;
             padding: 28px 24px 32px;
-            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(230, 215, 170, 0.2);
+            box-shadow: 0 30px 45px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(150, 100, 150, 0.3);
         }
 
         .header {
@@ -47,28 +47,29 @@
         }
 
         .header h1 {
-            font-size: 2.1rem;
-            background: linear-gradient(135deg, #f2e3c9, #cfb177);
+            font-size: 2rem;
+            background: linear-gradient(135deg, #c9b3d4, #9b6d9b);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             font-weight: 500;
+            letter-spacing: 1px;
         }
 
         .sub {
-            color: #b7ab8c;
+            color: #9a8aaa;
             font-size: 0.85rem;
             margin-top: 6px;
         }
 
-        /* контейнер с гифкой */
         .gif-container {
             border-radius: 42px;
             overflow: hidden;
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
-            background: #00000030;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.7);
+            background: #050510;
             margin: 20px 0 18px;
             position: relative;
+            border: 1px solid rgba(150, 80, 150, 0.4);
         }
 
         .gif-container img {
@@ -77,9 +78,9 @@
             display: block;
             object-fit: cover;
             aspect-ratio: 16 / 9;
+            filter: brightness(0.95) contrast(1.05);
         }
 
-        /* скрытый YouTube-плеер */
         .hidden-player {
             position: absolute;
             width: 1px;
@@ -95,15 +96,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 50px;
+            gap: 45px;
             flex-wrap: wrap;
             margin: 20px 0 12px;
         }
 
-        /* ===== КНОПКА PLAY/PAUSE ===== */
+        /* КНОПКА PLAY/PAUSE */
         .play-pause-btn {
-            background: linear-gradient(145deg, #2a2f34, #1e2227);
-            border: none;
+            background: linear-gradient(145deg, #1e1a2a, #12101c);
+            border: 1px solid rgba(180, 130, 180, 0.4);
             width: 70px;
             height: 70px;
             border-radius: 50%;
@@ -112,13 +113,14 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.05);
             position: relative;
         }
 
         .play-pause-btn:hover {
             transform: scale(1.05);
-            background: linear-gradient(145deg, #3a4047, #2a2f34);
+            background: linear-gradient(145deg, #2e2540, #1e1a2a);
+            border-color: rgba(200, 150, 200, 0.6);
         }
 
         .play-pause-btn:active {
@@ -131,7 +133,7 @@
             width: 100%;
             height: 100%;
             border-radius: 50%;
-            background: rgba(207, 177, 119, 0.3);
+            background: rgba(160, 100, 160, 0.3);
             opacity: 0;
             transition: opacity 0.3s;
         }
@@ -156,7 +158,7 @@
             height: 0;
             border-style: solid;
             border-width: 14px 0 14px 22px;
-            border-color: transparent transparent transparent #f0e2c5;
+            border-color: transparent transparent transparent #d9b4d9;
             margin-left: 6px;
         }
 
@@ -171,7 +173,7 @@
             display: block;
             width: 7px;
             height: 22px;
-            background-color: #f0e2c5;
+            background-color: #d9b4d9;
             border-radius: 2px;
         }
 
@@ -188,88 +190,72 @@
             display: flex;
         }
 
-        /* ===== ВЕРТИКАЛЬНЫЙ ПОЛЗУНОК ===== */
+        /* ГОРИЗОНТАЛЬНЫЙ ПОЛЗУНОК (без иконки) */
         .volume-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(32, 38, 44, 0.4);
-            padding: 12px 8px;
-            border-radius: 40px;
-            backdrop-filter: blur(4px);
+            background: rgba(20, 15, 30, 0.7);
+            padding: 8px 22px;
+            border-radius: 60px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(150, 100, 150, 0.3);
         }
 
-        .volume-vertical {
+        .volume-control {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 14px;
         }
 
         input[type="range"].volume-slider {
-            writing-mode: bt-lr;
-            -webkit-appearance: slider-vertical;
-            width: 4px;
-            height: 80px;
-            background: rgba(180, 170, 140, 0.3);
-            border-radius: 4px;
+            width: 150px;
+            height: 2px;
+            -webkit-appearance: none;
+            background: rgba(180, 150, 180, 0.4);
+            border-radius: 2px;
             outline: none;
             cursor: pointer;
         }
 
         input[type="range"].volume-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            background: #dccdab;
+            width: 12px;
+            height: 12px;
+            background: #c9a0c9;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s ease;
+            box-shadow: 0 0 4px #b77eb7;
         }
 
         input[type="range"].volume-slider::-webkit-slider-thumb:hover {
-            transform: scale(1.2);
-            background: #f0e2c5;
-        }
-
-        input[type="range"].volume-slider::-moz-range-track {
-            width: 4px;
-            height: 80px;
-            background: rgba(180, 170, 140, 0.3);
-            border-radius: 4px;
-        }
-
-        input[type="range"].volume-slider::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            background: #dccdab;
-            border-radius: 50%;
-            border: none;
-            cursor: pointer;
+            transform: scale(1.25);
+            background: #e0bae0;
         }
 
         .volume-value {
-            font-size: 0.7rem;
-            color: #a89a7a;
+            font-size: 0.75rem;
+            color: #b999c9;
+            min-width: 40px;
             text-align: center;
-            min-width: 35px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
         }
 
         .status {
             text-align: center;
-            background: #00000033;
+            background: #00000055;
             padding: 8px 16px;
             border-radius: 80px;
             font-size: 0.8rem;
-            color: #cec09b;
+            color: #bbaacc;
             width: fit-content;
             margin: 12px auto 0;
+            backdrop-filter: blur(4px);
         }
 
         footer {
             text-align: center;
             font-size: 0.7rem;
-            color: #7b715a;
+            color: #6a5a7a;
             margin-top: 28px;
         }
 
@@ -278,25 +264,25 @@
             .play-pause-btn { width: 60px; height: 60px; }
             .play-icon { border-width: 12px 0 12px 18px; }
             .pause-icon span { width: 6px; height: 18px; }
-            .volume-wrap { padding: 8px 6px; }
-            input[type="range"].volume-slider { height: 60px; }
-            .controls-panel { gap: 35px; }
+            .volume-wrap { padding: 5px 16px; }
+            input[type="range"].volume-slider { width: 100px; }
+            .controls-panel { gap: 30px; }
         }
     </style>
 </head>
 <body>
 <div class="lofi-card">
     <div class="header">
-        <h1>🎧 lofi комната 🌙</h1>
-        <div class="sub">медленный поток · успокаивающие биты</div>
+        <h1>🎧 shadow lofi 🌑</h1>
+        <div class="sub">мрачные биты · поток энергии</div>
     </div>
 
-    <!-- ГИФКА (видимая часть) -->
+    <!-- ГИФКА SHADOW FIEND -->
     <div class="gif-container">
-        <img src="https://media1.tenor.com/m/iYTigQdnvI0AAAAd/dota-shadow-fiend.gif" id="loFiGif">
+        <img src="https://media1.tenor.com/m/iYTigQdnvI0AAAAd/dota-shadow-fiend.gif" alt="Shadow Fiend lofi vibe">
     </div>
 
-    <!-- СКРЫТЫЙ YouTube-плеер (только звук) -->
+    <!-- СКРЫТЫЙ YOUTUBE ПЛЕЕР (только звук) -->
     <div class="hidden-player" id="youtubePlayer"></div>
 
     <div class="controls-panel">
@@ -309,24 +295,24 @@
         </button>
 
         <div class="volume-wrap">
-            <div class="volume-vertical">
-                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70" orient="vertical">
+            <div class="volume-control">
+                <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
                 <span class="volume-value" id="volumeValue">70%</span>
             </div>
         </div>
     </div>
 
     <div class="status" id="nowPlayingStatus">
-        🎵 сейчас играет: lo-fi hip hop radio
+        🎵 currently playing: lofi hip hop radio
     </div>
-    <footer>⟡ просто слушай и отдыхай ⟡</footer>
+    <footer>⟡ слушай и погружайся ⟡</footer>
 </div>
 
 <script>
     let player;
     let isPlayerReady = false;
     let isPlaying = true;
-    const VIDEO_ID = "5yx6BWlEVcY";  // лоуфай радио
+    const VIDEO_ID = "5yx6BWlEVcY";  // лоуфай-радио (рабочий)
 
     // загружаем YouTube API
     const tag = document.createElement('script');
